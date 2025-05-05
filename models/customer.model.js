@@ -30,7 +30,7 @@ export const customerSchema = new Schema(
   { timestamps: true }
 );
 
-customerSchema.methods.updateLoanAmounts = async function (next) {
+customerSchema.methods.updateLoanStats = async function () {
   const loans = await Loan.find({ customerId: this._id });
 
   this.totalLoanAmount = loans.reduce(
@@ -53,11 +53,17 @@ customerSchema.methods.updateLoanAmounts = async function (next) {
 };
 
 customerSchema.pre("save", async function (next) {
-  try {
-    await this.updateLoanAmounts();
-    next();
-  } catch (error) {
-    next(error);
+  await this.updateLoanStats();
+  next();
+});
+
+customerSchema.post(["find", "findOne"], async function (docs) {
+  if (!docs) return;
+
+  if (Array.isArray(docs)) {
+    await Promise.all(docs.map((doc) => doc?.updateLoanStats()));
+  } else {
+    await docs.updateLoanStats();
   }
 });
 

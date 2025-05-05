@@ -40,10 +40,6 @@ export const createLoan = async (req, res) => {
 
     await loan.save();
 
-    const customer = await Customer.findById(customerId);
-    await customer.updateLoanAmounts();
-    await customer.save();
-
     res.status(201).json({ message: "loan created successfully!", loan });
   } catch (error) {
     console.error("Error while creating customer", error);

@@ -1,3 +1,4 @@
+import { Customer } from "../models/customer.model.js";
 import { Loan } from "../models/loan.model.js";
 
 export const getOverdues = async (req, res) => {
@@ -5,12 +6,14 @@ export const getOverdues = async (req, res) => {
   try {
     const shopkeeperId = req.userId;
 
-    const overdueCustomers = await Loan.find({
+    const overdueCustomerIds = await Loan.distinct("customerId", {
       shopkeeperId,
       status: "overdue",
-    })
-      .populate("customerId", "name phone address trustScore")
-      .select("loanAmount balance dueDate issueDate status customerId");
+    });
+
+    const overdueCustomers = await Customer.find({
+      _id: { $in: overdueCustomerIds },
+    });
 
     res.status(200).json({
       message: "overdue Customers retrived successfully!",

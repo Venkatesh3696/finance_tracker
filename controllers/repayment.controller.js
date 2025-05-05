@@ -1,5 +1,4 @@
 import { Repayment } from "../models/repayment.model.js";
-import { Customer } from "../models/customer.model.js";
 
 export const createRepayment = async (req, res) => {
   const { loanId, amount } = req.body;
@@ -12,12 +11,6 @@ export const createRepayment = async (req, res) => {
       shopkeeperId,
     });
     await repayment.save();
-
-    const { customerId } = repayment;
-
-    const customer = await Customer.findById(customerId);
-    await customer.updateLoanAmounts();
-    await customer.save();
 
     res.status(200).json({ message: "Repayment successful", repayment });
   } catch (error) {
@@ -36,7 +29,7 @@ export const getRepayments = async (req, res) => {
       .status(200)
       .json({ message: "repayments retrived successfully!", repayments });
   } catch (error) {
-    console.error("Error while retriving customers", error);
+    console.error("Error while retriving repayments", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
