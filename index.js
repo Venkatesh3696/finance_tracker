@@ -30,15 +30,15 @@ app.use("/api/repayments", verifyToken, repaymentRouter);
 app.use("/api/summary", verifyToken, getSummary);
 app.use("/api/overdue", verifyToken, getOverdues);
 
-app.get("/", () => {
-  console.log("welcome to NetWorth Tracker! ");
+app.get("/", (req, res) => {
+  res.send("Welcome to NetWorth Tracker!");
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 connectDb()
   .then(() => {
-    app.listen(PORT, "0.0.0.0", () => {
+    app.listen(PORT, () => {
       console.log(`app is listening at port ${PORT}`);
     });
   })
