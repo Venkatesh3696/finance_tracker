@@ -1,20 +1,29 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { connectDb } from "./config/connectDb.js";
-import authRouter from "./routes/auth.router.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+
+import { connectDb } from "./config/connectDb.js";
+import authRouter from "./routes/auth.router.js";
+import customerRouter from "./routes/customer.router.js";
+import loanRouter from "./routes/loan.router.js";
+import repaymentRouter from "./routes/repayment.router.js";
+
+import { verifyToken } from "./middlewares/auth.middleware.js";
 
 dotenv.config();
 const app = express();
 
-app.use(cors());
 app.use(cookieParser());
+app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
 app.use("/api/auth", authRouter);
+app.use("/api/customers", verifyToken, customerRouter);
+app.use("/api/loans", verifyToken, loanRouter);
+app.use("/api/repayments", verifyToken, repaymentRouter);
 
 app.get("/", () => {
   console.log("welcome to NetWorth Tracker! ");

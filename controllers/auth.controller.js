@@ -52,6 +52,7 @@ export const Login = async (req, res) => {
     }
 
     const token = existingShopkeeper.generateToken();
+    console.log(process.env.NODE_ENV);
 
     res.cookie("token", token, {
       httpOnly: true,

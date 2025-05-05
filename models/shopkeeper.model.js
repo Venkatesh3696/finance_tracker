@@ -46,4 +46,4 @@ shopkeeperSchema.methods.generateToken = function () {
   return jwt.sign(payload, secret, options);
 };
 
-export const Shopkeeper = model("Shopkeeper", shopkeeperSchema);
+export const Shopkeeper = model("Shopkeeper", shopkeeperSchema, "shopkeepers");
