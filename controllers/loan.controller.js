@@ -33,9 +33,8 @@ export const getLoans = async (req, res) => {
     const shopkeeperId = req.userId;
 
     const loans = await Loan.find({ shopkeeperId });
-    console.log({ loans });
 
-    res.status(201).json({ message: "loan created successfully!", loans });
+    res.status(200).json({ message: "loans retrived successfully!", loans });
   } catch (error) {
     console.error("Error while creating customer", error);
     res.status(500).json({ message: "Server error", error });
@@ -47,9 +46,8 @@ export const getLoan = async (req, res) => {
     const { loanId } = req.params;
 
     const loan = await Loan.findById(loanId);
-    console.log({ loan });
 
-    res.status(201).json({ message: "loan fetched successfully!", loan });
+    res.status(200).json({ message: "loan fetched successfully!", loan });
   } catch (error) {
     console.error("Error while creating customer", error);
     res.status(500).json({ message: "Server error", error });
@@ -57,33 +55,33 @@ export const getLoan = async (req, res) => {
 };
 
 export const updateLoan = async (req, res) => {
-  const { customerId } = req.params;
+  const { laonId } = req.params;
   const shopkeeperId = req.userId;
   try {
-    console.log({ customerId });
-    const customer = await Customer.findById(customerId);
-    console.log({ customer });
+    console.log({ laonId });
+    const loan = await Loan.findById(laonId);
+    console.log({ loan });
 
-    if (!customer) {
+    if (!loan) {
       return res.status(404).json({ message: "Customer not found" });
     }
 
-    if (customer.shopkeeperId.toString() !== shopkeeperId) {
+    if (loan.shopkeeperId.toString() !== shopkeeperId) {
       return res
         .status(403)
-        .json({ message: "Not authorized to update this customer" });
+        .json({ message: "Not authorized to update this Loan!" });
     }
 
-    const allowedFields = ["name", "phone", "address"];
+    const allowedFields = ["frequency", "issueDate", "loanAmount"];
 
     for (const key of allowedFields) {
       if (req.body[key]) {
-        customer[key] = req.body[key];
+        loan[key] = req.body[key];
       }
     }
 
-    await customer.save();
-    res.status(200).json({ message: "Customer updated", customer });
+    await loan.save();
+    res.status(200).json({ message: "Customer updated", loan });
   } catch (error) {
     console.error("Error while retriving customers", error);
     res.status(500).json({ message: "Server error", error });
@@ -99,7 +97,7 @@ export const deleteLoan = async (req, res) => {
     const loan = await Loan.findByIdAndDelete(loanId);
     console.log({ loan });
 
-    res.status(201).json({ message: "loan deleted successfully!", loan });
+    res.status(200).json({ message: "loan deleted successfully!", loan });
   } catch (error) {
     console.error("Error while dleting customer", error);
     res.status(500).json({ message: "Server error", error });
