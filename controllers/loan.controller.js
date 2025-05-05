@@ -3,7 +3,7 @@ import { Loan } from "../models/loan.model.js";
 
 export const createLoan = async (req, res) => {
   try {
-    const { customerId, itemDescription, loanAmount } = req.body;
+    const { customerId, itemDescription, loanAmount, issueDate } = req.body;
     const shopkeeperId = req.userId;
 
     if (!customerId || !loanAmount) {
@@ -12,14 +12,37 @@ export const createLoan = async (req, res) => {
         .json({ message: "all fields required are needed!" });
     }
 
-    const loan = new Loan({
+    const loanData = {
       shopkeeperId,
       loanAmount,
       customerId,
       itemDescription,
-    });
+    };
+
+    if (issueDate) {
+      const parsedDate = new Date(issueDate);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({
+          message: "Invalid issue date format. Use YYYY-MM-DD",
+        });
+      }
+
+      if (parsedDate > new Date()) {
+        return res.status(400).json({
+          message: "Issue date cannot be in the future",
+        });
+      }
+
+      loanData.issueDate = parsedDate;
+    }
+
+    const loan = new Loan(loanData);
 
     await loan.save();
+
+    const customer = await Customer.findById(customerId);
+    await customer.updateLoanAmounts();
+    await customer.save();
 
     res.status(201).json({ message: "loan created successfully!", loan });
   } catch (error) {
@@ -81,6 +104,13 @@ export const updateLoan = async (req, res) => {
     }
 
     await loan.save();
+
+    const { customerId } = loan;
+
+    const customer = await Customer.findById(customerId);
+    await customer.updateLoanAmounts();
+    await customer.save();
+
     res.status(200).json({ message: "Customer updated", loan });
   } catch (error) {
     console.error("Error while retriving customers", error);

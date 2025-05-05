@@ -8,7 +8,9 @@ export const getOverdues = async (req, res) => {
     const overdueCustomers = await Loan.find({
       shopkeeperId,
       status: "overdue",
-    }).populate("customerId");
+    })
+      .populate("customerId", "name phone address trustScore")
+      .select("loanAmount balance dueDate issueDate status customerId");
 
     res.status(200).json({
       message: "overdue Customers retrived successfully!",
